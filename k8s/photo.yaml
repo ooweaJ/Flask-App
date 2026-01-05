@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: photo-service
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: photo-service
@@ -23,6 +24,13 @@ spec:
       - name: photo-storage
         persistentVolumeClaim:
           claimName: photo-pvc
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "200m"
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
 ---
 apiVersion: v1
 kind: Service

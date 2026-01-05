@@ -4,6 +4,7 @@ import uuid
 from fastapi import FastAPI, UploadFile, File, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # 1. 저장 경로를 아예 마운트 경로와 일치시킵니다.
 PHOTOS_DIR = "/app/static/uploads"
@@ -21,6 +22,11 @@ app = FastAPI()
 
 # 2. 스태틱 마운트도 동일하게 설정 (이미 되어있다면 확인만)
 app.mount("/static/uploads", StaticFiles(directory=PHOTOS_DIR), name="photos")
+
+# 서버 시작 시 프로메테우스 지표 활성화
+@app.on_event("startup")
+async def startup():
+    Instrumentator().instrument(app).expose(app)
 
 @app.post("/upload")
 async def upload_photo(file: UploadFile = File(...)):

@@ -44,6 +44,13 @@ spec:
       containers:
       - name: nginx
         image: jaewoozzang/frontend:v0.85
+      resources:
+        limits:
+          memory: "256Mi"
+          cpu: "200m"
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
 ---
 apiVersion: v1
 kind: Service

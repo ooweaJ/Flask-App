@@ -1,6 +1,7 @@
 import time # 시간 측정을 위한 모듈
 from fastapi import FastAPI, Request, Response, HTTPException # FastAPI 프레임워크 관련 모듈
 from fastapi.middleware.cors import CORSMiddleware # CORS(교차 출처 리소스 공유) 미들웨어
+from prometheus_fastapi_instrumentator import Instrumentator
 import httpx # 비동기 HTTP 요청을 위한 라이브러리 (FastAPI의 비동기 특성과 호환)
 
 app = FastAPI() # FastAPI 애플리케이션 인스턴스 생성
@@ -22,6 +23,11 @@ PHOTO_SERVICE_URL = "http://photo-service:5003" # 새로운 사진 서비스 URL
 # 비동기 요청을 위한 httpx 클라이언트 초기화
 # 연결 풀링을 위해 전역 클라이언트 사용
 client = httpx.AsyncClient()
+
+# 서버 시작 시 프로메테우스 지표 활성화
+@app.on_event("startup")
+async def startup():
+    Instrumentator().instrument(app).expose(app)
 
 @app.on_event("shutdown")
 async def shutdown_event():

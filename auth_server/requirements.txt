@@ -1,4 +1,5 @@
 fastapi # FastAPI 웹 프레임워크
+prometheus-fastapi-instrumentator
 uvicorn # ASGI 서버
 PyJWT
 

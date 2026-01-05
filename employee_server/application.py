@@ -9,6 +9,7 @@ from fastapi.routing import APIRoute # API 라우팅을 위한 모듈
 from fastapi.staticfiles import StaticFiles # 정적 파일 제공을 위한 모듈
 from pydantic import BaseModel # 데이터 유효성 검사를 위한 Pydantic 모델
 from fastapi.security import OAuth2PasswordBearer # OAuth2 Bearer 토큰 인증을 위한 모듈
+from prometheus_fastapi_instrumentator import Instrumentator
 import httpx # 비동기 HTTP 요청을 위한 라이브러리
 
 import config # 애플리케이션 설정
@@ -46,6 +47,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token") # tokenUrl은 Swagger UI�
 
 # httpx 클라이언트 초기화
 client = httpx.AsyncClient()
+
+# 서버 시작 시 프로메테우스 지표 활성화
+@app.on_event("startup")
+async def startup():
+    Instrumentator().instrument(app).expose(app)
 
 @app.on_event("shutdown")
 async def shutdown_event():
