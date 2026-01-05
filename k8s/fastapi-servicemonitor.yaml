@@ -4,7 +4,8 @@ metadata:
   name: fastapi-monitor
   namespace: monitoring        # 프로메테우스가 설치된 네임스페이스
   labels:
-    release: monitoring-kube-prometheus  # 중요: 설치된 Prometheus 릴리즈 이름과 일치해야 함
+    app.kubernetes.io/instance: monitoring
+    release: monitoring  # 중요: 설치된 Prometheus 릴리즈 이름과 일치해야 함
 spec:
   selector:
     matchLabels:
@@ -17,3 +18,15 @@ spec:
     path: /metrics             # FastAPI Instrumentator가 지표를 뱉는 경로
     interval: 15s              # 15초마다 수집
     honorLabels: true
+  - targetPort: 5000
+    path: /metrics
+    interval: 15s
+  - targetPort: 5001
+    path: /metrics
+    interval: 15s
+  - targetPort: 5002
+    path: /metrics
+    interval: 15s
+  - targetPort: 5003
+    path: /metrics
+    interval: 15s
