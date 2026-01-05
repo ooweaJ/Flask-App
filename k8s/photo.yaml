@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: photo-service
-        image: jaewoozzang/photo_service:v0.93
+        image: hyunhojang/photo_service:v2.0
         ports:
         - containerPort: 5003
         volumeMounts:

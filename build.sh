@@ -1,10 +1,10 @@
-docker build -t jaewoozzang/auth_server:v0.7 ./auth_server
-docker build -t jaewoozzang/employee_server:v0.7 ./employee_server
-docker build -t jaewoozzang/gateway:v1.6 ./gateway
-docker build -t jaewoozzang/photo_service:v0.9 ./photo_service
-docker build -t jaewoozzang/frontend:v0.8 ./frontend
-docker push jaewoozzang/auth_server:v0.7
-docker push jaewoozzang/employee_server:v0.7
-docker push jaewoozzang/gateway:v1.6
-docker push jaewoozzang/photo_service:v0.9
-docker push jaewoozzang/frontend:v0.8
+docker build -t hyunhojang/auth_server:v2.0 ./auth_server
+docker build -t hyunhojang/employee_server:v2.0 ./employee_server
+docker build -t hyunhojang/gateway:v2.0 ./gateway
+docker build -t hyunhojang/photo_service:v2.0 ./photo_service
+docker build -t hyunhojang/frontend:v2.0 ./frontend
+docker push hyunhojang/auth_server:v2.0
+docker push hyunhojang/employee_server:v2.0
+docker push hyunhojang/gateway:v2.0
+docker push hyunhojang/photo_service:v2.0
+docker push hyunhojang/frontend:v2.0
