@@ -29,36 +29,6 @@ async def shutdown_event():
     await client.aclose()
 
 # 직원 사진 요청을 위한 프록시 엔드포인트
-@app.api_route("/static/uploads/{photo_name:path}", methods=["GET", "HEAD"])
-async def proxy_employee_photo_requests(photo_name: str, request: Request):
-    # 이 로그가 찍히면 Gateway까지는 온 겁니다.
-    print(f"!!! [GATEWAY] PHOTO REQUEST DETECTED: {photo_name} !!!")
-    
-    # 쿼리 스트링 등이 붙어올 경우를 대비해 순수 파일명만 추출
-    clean_name = photo_name.split('?')[0]
-    url = f"{PHOTO_SERVICE_URL}/photos/{clean_name}"
-    
-    try:
-        # 1. Photo Service로 요청
-        async with httpx.AsyncClient() as c:
-            resp = await c.get(url, timeout=5.0)
-            
-            # 2. 결과 로그
-            print(f"!!! [GATEWAY] PHOTO-SERVICE RESP: {resp.status_code} for {url} !!!")
-            
-            if resp.status_code == 200:
-                return Response(
-                    content=resp.content,
-                    status_code=200,
-                    media_type="image/jpeg" # 브라우저가 다운로드나 리다이렉트 대신 이미지를 보여주게 함
-                )
-            else:
-                # 사진이 없으면 404를 명시적으로 반환 (홈페이지 이동 방지)
-                return Response(content="Photo Not Found", status_code=404)
-                
-    except Exception as e:
-        print(f"!!! [GATEWAY] PROXY ERROR: {e} !!!")
-        return Response(content=str(e), status_code=503)
 
 # auth_server로 요청 프록시
 @app.api_route("/api/auth/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])

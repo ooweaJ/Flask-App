@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: jaewoozzang/frontend:v0.85
+        image: jaewoozzang/frontend:v0.86
 ---
 apiVersion: v1
 kind: Service

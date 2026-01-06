@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-sentinel-service
+spec:
+  ports:
+    - name: sentinel
+      port: 26379
+      targetPort: 26379
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: redis-sentinel-service
+subsets:
+  - addresses:
+      - ip: 192.168.90.17
+    ports:
+      - name: sentinel
+        port: 26379

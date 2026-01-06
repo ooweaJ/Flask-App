@@ -13,12 +13,14 @@ spec:
     spec:
       containers:
       - name: employee-server
-        image: jaewoozzang/employee_server:v0.95
+        image: jaewoozzang/employee_server:v0.98
         ports:
         - containerPort: 5002
         envFrom:
         - configMapRef:
             name: db-config
+        - configMapRef:
+            name: redis-config
         - secretRef:
             name: db-credentials
 ---
