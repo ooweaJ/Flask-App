@@ -46,7 +46,7 @@ spec:
         image: hyunhojang/frontend:v2.01
         resources:
           limits:
-            memory: "256Mi"
+            memory: "512Mi"
             cpu: "200m"
           requests:
             memory: "128Mi"

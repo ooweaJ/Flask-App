@@ -21,7 +21,7 @@ spec:
       name: memory
       target:
         type: Utilization
-        averageUtilization: 50 # Target Memory utilization percentage
+        averageUtilization: 70 # Target Memory utilization percentage
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -46,7 +46,7 @@ spec:
       name: memory
       target: 
         type: Utilization
-        averageUtilization: 50 # Target Memory utilization percentage
+        averageUtilization: 70 # Target Memory utilization percentage
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -71,7 +71,7 @@ spec:
       name: memory
       target:
         type: Utilization
-        averageUtilization: 50 # Target Memory utilization percentage
+        averageUtilization: 70 # Target Memory utilization percentage
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -90,7 +90,7 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 50 # Target CPU utilization percentage
+        averageUtilization: 70 # Target CPU utilization percentage
   - type: Resource
     resource:
       name: memory
@@ -121,4 +121,4 @@ spec:
       name: memory
       target:
         type: Utilization
-        averageUtilization: 50 # Target Memory utilization percentage
+        averageUtilization: 70 # Target Memory utilization percentage

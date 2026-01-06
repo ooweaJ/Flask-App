@@ -22,7 +22,7 @@ spec:
           mountPath: /app/static/uploads
         resources:
           limits:
-            memory: "256Mi"
+            memory: "512Mi"
             cpu: "200m"
           requests:
             memory: "128Mi"
