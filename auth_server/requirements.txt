@@ -1,4 +1,7 @@
-fastapi # FastAPI 웹 프레임워크
-uvicorn # ASGI 서버
-PyJWT
-
+fastapi
+uvicorn
+sqlmodel
+mysql-connector-python
+cryptography
+pyjwt
+passlib[bcrypt]

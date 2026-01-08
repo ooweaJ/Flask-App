@@ -11,11 +11,21 @@
         <h1>Employee Management System</h1>
 
         <div id="auth-section">
-            <h2>Login</h2>
+            <h2 id="auth-title">Login</h2>
             <form id="login-form">
-                <input type="text" id="username" placeholder="Username" value="admin" required>
-                <input type="password" id="password" placeholder="Password" value="password" required>
-                <button type="submit">Login</button>
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+
+                <div id="signup-fields" style="display: none;">
+                    <input type="text" id="full_name_reg" placeholder="Full Name (실명)">
+                    <input type="email" id="email_reg" placeholder="Email Address">
+                </div>
+
+                <button type="submit" id="main-auth-btn">Login</button>
+                <p style="margin-top: 15px; font-size: 0.9em;">
+                    <span id="toggle-text">Don't have an account?</span>
+                    <a href="javascript:void(0)" id="toggle-auth-mode">Register here</a>
+                </p>
             </form>
             <p id="auth-message" class="message"></p>
         </div>
@@ -27,8 +37,7 @@
             <h3>Employee List</h3>
             <button id="refresh-employees">Refresh List</button>
             <div id="employee-list">
-                <!-- Employee data will be loaded here -->
-            </div>
+                </div>
 
             <h3>Add/Edit Employee</h3>
             <form id="employee-form">
@@ -40,7 +49,7 @@
                     <label for="photo">Photo:</label>
                     <input type="file" id="photo" accept="image/*">
                     <div id="photo-preview-container">
-                        <img id="photo-preview" src="/static/no_photo.png" alt="Photo Preview" width="120" height="160">
+                        <img id="photo-preview" src="/no_photo.png" alt="Photo Preview" width="120" height="160">
                     </div>
                 </div>
 
@@ -66,13 +75,12 @@
                 <button type="button" id="cancel-edit" style="display: none;">Cancel Edit</button>
             </form>
             <p id="employee-message" class="message"></p>
-            <div id="loading-indicator">
+            <div id="loading-indicator" style="display: none;">
                 <div class="spinner"></div>
                 <p>Loading...</p>
             </div>
         </div>
     </div>
-
     <script src="/app.js"></script>
 </body>
 </html>

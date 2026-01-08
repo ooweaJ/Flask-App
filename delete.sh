@@ -5,3 +5,4 @@ kubectl delete -f k8s/gateway.yaml
 kubectl delete -f k8s/nginx.yaml
 kubectl delete -f k8s/db-config-secret.yaml
 kubectl delete -f k8s/pv-pvc.yaml
+kubectl delete -f k8s/redis-external.yaml

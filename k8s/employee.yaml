@@ -13,7 +13,8 @@ spec:
     spec:
       containers:
       - name: employee-server
-        image: jaewoozzang/employee_server:v0.98
+        image: jaewoozzang/employee_server:v1.03
+        imagePullPolicy: Always
         ports:
         - containerPort: 5002
         envFrom:

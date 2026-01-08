@@ -7,7 +7,6 @@ from fastapi.staticfiles import StaticFiles
 
 # 1. 저장 경로를 아예 마운트 경로와 일치시킵니다.
 PHOTOS_DIR = "/app/static/uploads"
-os.makedirs(PHOTOS_DIR, exist_ok=True)
 
 # PHOTOS_DIR이 없으면 생성
 os.makedirs(PHOTOS_DIR, exist_ok=True)

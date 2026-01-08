@@ -11,12 +11,12 @@ from fastapi.staticfiles import StaticFiles # 정적 파일 제공을 위한 모
 from pydantic import BaseModel # 데이터 유효성 검사를 위한 Pydantic 모델
 from fastapi.security import OAuth2PasswordBearer # OAuth2 Bearer 토큰 인증을 위한 모듈
 import httpx # 비동기 HTTP 요청을 위한 라이브러리
-from redis_config import get_redis_master # Redis 설정 및 연결 함수 가져오기
 
-import config # 애플리케이션 설정
-import util # 유틸리티 함수
-import database # 데이터베이스 관련 함수
-from models import Employee, EmployeePublic, EmployeesListResponse # 데이터 모델 정의
+from common import config   # import common.config 대신
+from common import database # import common.database 대신
+import util 
+from common.models import Employee, EmployeePublic, EmployeesListResponse 
+from common.redis_config import get_redis_master 
 
 app = FastAPI() # FastAPI 애플리케이션 인스턴스 생성
 
@@ -41,7 +41,7 @@ client = httpx.AsyncClient()
 async def shutdown_event():
     await client.aclose()
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user_info(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -50,9 +50,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("user")
-        if username is None:
+        user_id: int = payload.get("id")
+        
+        # [수정 포인트] 아래 if 문이 payload 변수들과 세로 줄이 딱 맞아야 합니다.
+        if username is None or user_id is None:
             raise credentials_exception
-        return username
+            
+        return {"username": username, "id": user_id}
     except (jwt.ExpiredSignatureError, jwt.PyJWTError):
         raise credentials_exception
 
@@ -65,21 +69,24 @@ async def on_startup():
     database.create_db_and_tables()
 
 @app.get("/employees", response_model=EmployeesListResponse)
-async def get_employees():
+async def get_employees(user: dict = Depends(get_current_user_info)):
     """모든 직원의 목록을 JSON 배열로 반환합니다. (Redis 캐싱 적용)"""
     start_time = time.time()
     r = get_redis_master()
-    cache_key = "employees_list_cache"
 
-    # 1. Redis 캐시 확인
+    user_id = user["id"]
+    cache_key = f"employees_list_cache:{user_id}"
+
+   # 1. Redis 캐시 확인
     cached_data = r.get(cache_key)
     if cached_data:
         execution_time = (time.time() - start_time) * 1000
-        print(f"🚀 Redis Cache Hit: get_employees in {execution_time:.2f} ms")
+        print(f"🚀 Redis Cache Hit for User {user_id}: in {execution_time:.2f} ms")
         return json.loads(cached_data)
 
-    # 2. 캐시 없으면 DB 조회
-    employees: List[Employee] = database.list_employees()
+    # 2. 캐시 없으면 DB 조회 (수정된 database.list_employees 함수 사용 필요)
+    # database.py에서 list_employees(owner_id=user_id) 로 수정되어야 함
+    employees: List[Employee] = database.list_employees(owner_id=user_id)
     
     employees_public_data = []
     for employee in employees:
@@ -88,11 +95,11 @@ async def get_employees():
             emp_public.photo_url = get_photo_url_for_fastapi(employee.object_key)
         employees_public_data.append(emp_public)
     
-    # 3. DB 결과를 Redis에 저장 (600초간 유지)
+    # 3. Redis에 유저별 결과 저장
     r.setex(cache_key, 600, json.dumps([e.dict() for e in employees_public_data]))
 
     execution_time = (time.time() - start_time) * 1000
-    print(f"🐌 DB Query (Cache Miss): get_employees in {execution_time:.2f} ms")
+    print(f"🐌 DB Query (Cache Miss) for User {user_id}: in {execution_time:.2f} ms")
     return employees_public_data
 
 @app.get("/employee/{employee_id}", response_model=EmployeePublic, responses={404: {"description": "Employee not found"}})
@@ -130,9 +137,16 @@ async def save_employee(
     badges: str = Form(""),
     employee_id: Optional[int] = Form(None),
     photo: Optional[UploadFile] = File(None),
+    user: dict = Depends(get_current_user_info)
 ):
+
+    user_id = user["id"]
+    r = get_redis_master()
+    user_list_cache = f"employees_list_cache:{user_id}"
+
     key = None
     if photo and photo.filename != '':
+        # 이미지 업로드 로직 (기존과 동일)
         image_bytes = util.resize_image(photo.file, (120, 160))
         if image_bytes:
             try:
@@ -144,54 +158,55 @@ async def save_employee(
             except Exception as e:
                 raise HTTPException(status_code=500, detail=f"Could not upload image: {e}")
 
+    # [수정] Employee 객체 생성 시 owner_id 명시
     employee_data = Employee(
         id=employee_id,
         object_key=key,
         full_name=full_name,
         location=location,
         job_title=job_title,
-        badges=badges
+        badges=badges,
+        owner_id=user_id # 현재 로그인한 유저를 주인으로 설정
     )
 
-    r = get_redis_master()
     if employee_id:
+        # 수정 로직
         if key:
             old_employee = database.load_employee(employee_id)
             if old_employee and old_employee.object_key:
-                try:
-                    await client.delete(f"{config.PHOTO_SERVICE_URL}/photos/{old_employee.object_key}")
-                except Exception as e:
-                    print(f"Error deleting old photo: {e}")
+                try: await client.delete(f"{config.PHOTO_SERVICE_URL}/photos/{old_employee.object_key}")
+                except Exception as e: print(f"Error: {e}")
         
         updated_employee = database.update_employee(employee_id, employee_data)
         if updated_employee:
             r.delete(f"emp_cache:{employee_id}")
-            r.delete("employees_list_cache")
+            r.delete(user_list_cache) # 본인 리스트 캐시만 삭제
             return updated_employee
         raise HTTPException(status_code=404, detail="Employee not found")
     
     else:
+        # 신규 추가
         new_employee = database.add_employee(employee_data)
-        r.delete("employees_list_cache")
+        r.delete(user_list_cache) # 본인 리스트 캐시만 삭제
         return new_employee
 
 @app.delete("/employee/{employee_id}")
-async def delete_employee_route(employee_id: int):
+async def delete_employee_route(employee_id: int, user: dict = Depends(get_current_user_info)):
+    user_id = user["id"]
     employee = database.load_employee(employee_id)
-    if not employee:
-        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # [보안] 본인 데이터인지 확인
+    if not employee or employee.owner_id != user_id:
+        raise HTTPException(status_code=404, detail="Employee not found or unauthorized")
 
     if employee.object_key:
-        try:
-            await client.delete(f"{config.PHOTO_SERVICE_URL}/photos/{employee.object_key}")
-        except Exception as e:
-            print(f"Error deleting photo: {e}")
+        try: await client.delete(f"{config.PHOTO_SERVICE_URL}/photos/{employee.object_key}")
+        except Exception as e: print(f"Error: {e}")
 
     database.delete_employee(employee_id)
     
-    # 캐시 삭제
     r = get_redis_master()
     r.delete(f"emp_cache:{employee_id}")
-    r.delete("employees_list_cache")
+    r.delete(f"employees_list_cache:{user_id}")
     
     return JSONResponse(status_code=200, content={"success": True, "message": f"Employee {employee_id} deleted."})
