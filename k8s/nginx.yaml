@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: hyunhojang/frontend:v2.01
+        image: hyunhojang/frontend:v2.02
         resources:
           limits:
             memory: "512Mi"

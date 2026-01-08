@@ -7,6 +7,7 @@ WORKDIR /app
 # 의존성 파일 복사 및 설치
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y iproute2 && rm -rf /var/lib/apt/lists/*
 
 # 소스 코드 복사
 COPY . .

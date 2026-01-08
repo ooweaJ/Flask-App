@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: auth-server
-        image: hyunhojang/auth_server:v2.01
+        image: hyunhojang/auth_server:v2.02
         ports:
         - containerPort: 5001
         envFrom:
