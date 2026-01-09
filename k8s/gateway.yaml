@@ -11,8 +11,8 @@ spec:
     metadata:
       labels:
         app: gateway
-    serviceAccountName: gateway-sa
     spec:
+      serviceAccountName: gateway-sa
       containers:
       - name: gateway
         image: hyunhojang/gateway:v2.02

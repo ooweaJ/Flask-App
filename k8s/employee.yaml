@@ -11,8 +11,8 @@ spec:
     metadata:
       labels:
         app: employee-server
-    serviceAccountName: employee-sa
     spec:
+      serviceAccountName: employee-sa
       containers:
       - name: employee-server
         image: hyunhojang/employee_server:v2.02

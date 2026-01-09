@@ -40,8 +40,8 @@ spec:
     metadata:
       labels:
         app: nginx
-    serviceAccountName: nginx-sa
     spec:
+      serviceAccountName: nginx-sa
       containers:
       - name: nginx
         image: hyunhojang/frontend:v2.02
