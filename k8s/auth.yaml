@@ -12,6 +12,7 @@ spec:
       labels:
         app: auth-server
     spec:
+      serviceAccountName: auth-sa
       containers:
       - name: auth-server
         image: hyunhojang/auth_server:v2.02

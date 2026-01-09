@@ -12,6 +12,7 @@ spec:
       labels:
         app: photo-service
     spec:
+      serviceAccountName: photo-sa
       containers:
       - name: photo-service
         image: hyunhojang/photo_service:v2.02

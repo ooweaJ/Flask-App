@@ -11,6 +11,7 @@ spec:
     metadata:
       labels:
         app: employee-server
+    serviceAccountName: employee-sa
     spec:
       containers:
       - name: employee-server

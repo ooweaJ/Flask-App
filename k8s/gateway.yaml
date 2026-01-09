@@ -11,6 +11,7 @@ spec:
     metadata:
       labels:
         app: gateway
+    serviceAccountName: gateway-sa
     spec:
       containers:
       - name: gateway

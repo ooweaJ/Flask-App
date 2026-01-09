@@ -7,3 +7,10 @@ kubectl delete -f k8s/db-config-secret.yaml
 kubectl delete -f k8s/pv-pvc.yaml
 kubectl delete -f k8s/hpa.yaml
 kubectl delete -f k8s/fastapi-servicemonitor.yaml
+kubectl delete -f k8s/sa.yaml
+kubectl delete -f k8s/admin-clusterrole-binding.yaml
+kubectl delete -f k8s/db-access-role-and-binding.yaml
+kubectl delete -f k8s/dev-role-and-binding.yaml
+kubectl delete -f k8s/op-role-and-binding.yaml
+kubectl delete -f k8s/prometheus-rbac.yaml
+kubectl delete -f k8s/storage-access-role-and-binding.yaml
