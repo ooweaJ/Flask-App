@@ -10,6 +10,7 @@ from fastapi.routing import APIRoute # API 라우팅을 위한 모듈
 from fastapi.staticfiles import StaticFiles # 정적 파일 제공을 위한 모듈
 from pydantic import BaseModel # 데이터 유효성 검사를 위한 Pydantic 모델
 from fastapi.security import OAuth2PasswordBearer # OAuth2 Bearer 토큰 인증을 위한 모듈
+from prometheus_fastapi_instrumentator import Instrumentator
 import httpx # 비동기 HTTP 요청을 위한 라이브러리
 
 from common import config   # import common.config 대신
@@ -19,6 +20,9 @@ from common.models import Employee, EmployeePublic, EmployeesListResponse
 from common.redis_config import get_cache_redis, get_session_redis
 
 app = FastAPI() # FastAPI 애플리케이션 인스턴스 생성
+
+# Set up Prometheus instrumentation
+Instrumentator().instrument(app).expose(app)
 
 # CORS 미들웨어 설정
 app.add_middleware(
@@ -36,6 +40,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # httpx 클라이언트 초기화
 client = httpx.AsyncClient()
+
 
 @app.on_event("shutdown")
 async def shutdown_event():

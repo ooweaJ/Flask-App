@@ -2,6 +2,7 @@ fastapi==0.104.1   # FastAPI 웹 프레임워크
 uvicorn==0.23.2    # ASGI 서버
 pydantic==2.5.3    # 데이터 유효성 검사 및 설정 관리
 sqlmodel==0.0.14   # SQL 데이터베이스와 상호 작용하기 위한 라이브러리
+prometheus-fastapi-instrumentator
 
 PyJWT                  # JSON Web Token (JWT) 구현
 mysql-connector-python # MySQL 데이터베이스 커넥터

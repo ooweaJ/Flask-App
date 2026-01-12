@@ -4,6 +4,7 @@ import uuid
 from fastapi import FastAPI, UploadFile, File, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from prometheus_fastapi_instrumentator import Instrumentator
 
 # 1. 저장 경로를 아예 마운트 경로와 일치시킵니다.
 PHOTOS_DIR = "/app/static/uploads"
@@ -12,6 +13,9 @@ PHOTOS_DIR = "/app/static/uploads"
 os.makedirs(PHOTOS_DIR, exist_ok=True)
 
 app = FastAPI()
+
+# Set up Prometheus instrumentation
+Instrumentator().instrument(app).expose(app)
 
 # 정적 파일 제공 (저장된 사진을 직접 제공)
 # 이 마운트는 /photos/{object_key} 엔드포인트와 충돌하지 않도록 주의해야 합니다.

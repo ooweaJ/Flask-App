@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: auth-server
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: auth-server
@@ -11,6 +12,7 @@ spec:
       labels:
         app: auth-server
     spec:
+      serviceAccountName: auth-sa
       containers:
       - name: auth-server
         image: jaewoozzang/auth_server:v1.0
@@ -24,14 +26,24 @@ spec:
             name: redis-config
         - secretRef:
             name: db-credentials
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: auth-server
+  labels:
+    app: fastapi-app
 spec:
   ports:
-  - port: 5001
+  - name: http
+    port: 5001
     targetPort: 5001
   selector:
     app: auth-server
