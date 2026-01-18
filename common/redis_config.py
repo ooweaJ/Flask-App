@@ -23,13 +23,13 @@ def get_session_redis():
     # 상단에서 정의한 안전한 전역 변수를 사용합니다.
     sentinel = Sentinel(
         [(REDIS_SENTINEL_HOST, REDIS_SENTINEL_PORT)], 
-        socket_timeout=0.5
+        socket_timeout=0.5,
         password=REDIS_PASSWORD
     )
     return sentinel.master_for(
         REDIS_MASTER_NAME, 
         socket_timeout=0.5, 
-        decode_responses=True
+        decode_responses=True,
         password=REDIS_PASSWORD
     )
 
