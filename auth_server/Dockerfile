@@ -8,6 +8,7 @@ WORKDIR /app
 # passlib[bcrypt]가 포함된 requirements.txt여야 합니다.
 COPY auth_server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y iproute2 && rm -rf /var/lib/apt/lists/*
 
 # 1. 공통 폴더 복사 (컨테이너 내부 /app/common 위치에 저장됨)
 COPY common /app/common

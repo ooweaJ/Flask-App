@@ -3,6 +3,7 @@ import datetime
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from prometheus_fastapi_instrumentator import Instrumentator
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 # 우리가 만든 db.py와 models.py에서 필요한 것들을 가져옵니다.
@@ -12,6 +13,9 @@ from common.redis_config import get_session_redis
 # 1. 비밀번호 암호화 도구 설정 (bcrypt 알고리즘 사용)
 #pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI()
+
+# Set up Prometheus instrumentation
+Instrumentator().instrument(app).expose(app)
 
 app.add_middleware(
     CORSMiddleware,
