@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from prometheus_fastapi_instrumentator import Instrumentator
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
+from fastapi import Body
 # 우리가 만든 db.py와 models.py에서 필요한 것들을 가져옵니다.
 from common.database import get_user_by_username, add_user
 from common.models import User
@@ -42,7 +43,7 @@ class RegisterRequest(BaseModel):
 
 # --- [API 1] 회원가입 (Register) ---
 @app.post('/auth/register')
-async def register(req: RegisterRequest):
+async def register(req: RegisterRequest = Body(...)):
     # 1. 중복 체크 (DB에 이미 이 아이디가 있는지 확인)
     existing_user = get_user_by_username(req.username)
     if existing_user:
