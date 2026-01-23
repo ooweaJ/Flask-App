@@ -66,16 +66,26 @@ document.addEventListener('DOMContentLoaded', () => {
             resetEmployeeForm();
         }
     }
-
-    // --- 로그인/회원가입 요청 ---
+    
+// --- 로그인/회원가입 요청 ---
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         showLoading();
+
+        // 1. 공통 필드 (아이디, 비번) 가져오기
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         
         let url = isSignupMode ? `${API_BASE_URL}/api/auth/register` : `${API_BASE_URL}/api/auth/login`;
-        let bodyData = { username, password };
+        
+        // 2. 서버가 요구하는 정확한 필드명으로 객체 생성
+        // 핵심: register든 login이든 'username' 필드는 필수임!
+        let bodyData = { 
+            username: username, 
+            password: password 
+        };
+
+        // 3. 회원가입 모드일 때만 추가 필드 포함
         if (isSignupMode) {
             bodyData.full_name = document.getElementById('full_name_reg').value;
             bodyData.email = document.getElementById('email_reg').value;
@@ -85,24 +95,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bodyData)
+                body: JSON.stringify(bodyData) // 이제 여기 username이 무조건 포함됨!
             });
+
             const data = await response.json();
+
             if (response.ok) {
                 if (isSignupMode) {
-                    showMessage(authMessage, 'Registration successful! Please login.');
+                    // Registration successful! 메시지 출력
+                    showMessage(authMessage, '회원가입 성공! 로그인을 진행해주세요.');
+                    // 폼 초기화 및 로그인 모드로 전환
+                    isSignupMode = false;
                     toggleLink.click(); 
                 } else {
+                    // 로그인 성공 시
                     jwtToken = data.token;
                     localStorage.setItem('jwtToken', jwtToken);
                     setAuthUI(true);
                 }
             } else {
-                showMessage(authMessage, data.message || 'Error occurred', true);
+                // 서버에서 보낸 에러 메시지 표시 (이미 가입된 아이디 등)
+                // data.message가 없을 수도 있으니 data.detail 등도 체크
+                const errorMsg = data.message || data.detail || '인증 실패';
+                showMessage(authMessage, typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg), true);
             }
         } catch (error) {
-            showMessage(authMessage, error.message, true);
-        } finally { hideLoading(); }
+            // CORS 에러나 네트워크 에러 발생 시
+            showMessage(authMessage, "서버 연결 실패: " + error.message, true);
+            console.error("Connection Error:", error);
+        } finally { 
+            hideLoading(); 
+        }
     });
 
     // --- 직원 목록 출력 (기존 클래스명 적용) ---
